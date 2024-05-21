@@ -17,32 +17,47 @@ interface Transport {
   "Vélo électrique": number;
 }
 
+const carbonRates: Transport = {
+  "Voiture thermique": 218,
+  "Voiture électrique": 103,
+  "Train longue distance": 27,
+  "Train local": 10,
+  Avion: 259,
+  Marcher: 0,
+  Vélo: 0,
+  "Vélo électrique": 11,
+};
+
 function TravelCarbonSimulator() {
   const [trips, setTrips] = useState<number>(0);
-  const [currentTransport, setCurrentTransport] = useState<Transport>({
-    "Voiture thermique": 0,
-    "Voiture électrique": 0,
-    "Train longue distance": 0,
-    "Train local": 0,
-    Avion: 0,
-    Marcher: 0,
-    Vélo: 0,
-    "Vélo électrique": 0,
+  const [transport, setTransport] = useState<{
+    current: Transport;
+    new: Transport;
+  }>({
+    current: {
+      "Voiture thermique": 0,
+      "Voiture électrique": 0,
+      "Train longue distance": 0,
+      "Train local": 0,
+      Avion: 0,
+      Marcher: 0,
+      Vélo: 0,
+      "Vélo électrique": 0,
+    },
+    new: {
+      "Voiture thermique": 0,
+      "Voiture électrique": 0,
+      "Train longue distance": 0,
+      "Train local": 0,
+      Avion: 0,
+      Marcher: 0,
+      Vélo: 0,
+      "Vélo électrique": 0,
+    },
   });
-  const [newTransport, setNewTransport] = useState<Transport>({
-    ...currentTransport,
-  });
-  const [currentCarbon, setCurrentCarbon] = useState<number>(0);
-  const [newCarbon, setNewCarbon] = useState<number>(0);
-  const [carbonRates, setCarbonRates] = useState<Transport>({
-    "Voiture thermique": 218,
-    "Voiture électrique": 103,
-    "Train longue distance": 27,
-    "Train local": 10,
-    Avion: 259,
-    Marcher: 0,
-    Vélo: 0,
-    "Vélo électrique": 11,
+  const [carbon, setCarbon] = useState<{ current: number; new: number }>({
+    current: 0,
+    new: 0,
   });
 
   const calculateCarbon = (transport: Transport): number => {
@@ -57,20 +72,22 @@ function TravelCarbonSimulator() {
     setTrips(Number(e.target.value));
   };
 
-  const handleCurrentTransportChange = (
+  const handleTransportChange = (
     type: keyof Transport,
-    distance: number
+    distance: number,
+    mode: "current" | "new"
   ) => {
-    setCurrentTransport({ ...currentTransport, [type]: distance });
-    setCurrentCarbon(calculateCarbon(currentTransport));
+    setTransport((prev) => ({
+      ...prev,
+      [mode]: { ...prev[mode], [type]: distance },
+    }));
   };
 
-  const handleNewTransportChange = (
-    type: keyof Transport,
-    distance: number
-  ) => {
-    setNewTransport({ ...newTransport, [type]: distance });
-    setNewCarbon(calculateCarbon(newTransport));
+  const handleValidate = (mode: "current" | "new") => {
+    setCarbon((prev) => ({
+      ...prev,
+      [mode]: calculateCarbon(transport[mode]),
+    }));
   };
 
   const handleReduce = async () => {
@@ -78,15 +95,15 @@ function TravelCarbonSimulator() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        yearlyCarbonReduction: newCarbon - currentCarbon,
+        yearlyCarbonReduction: carbon.new - carbon.current,
       }),
     });
     if (response.ok) {
-      setCurrentCarbon(newCarbon);
-      setCurrentTransport(newTransport);
+      setCarbon((prev) => ({ ...prev, current: prev.new }));
+      setTransport((prev) => ({ ...prev, current: { ...prev.new } }));
       alert(
         `Vous avez réduit votre empreinte carbone de ${(
-          newCarbon - currentCarbon
+          carbon.new - carbon.current
         ).toFixed(2)} kg/an, félicitations !`
       );
     } else {
@@ -104,59 +121,55 @@ function TravelCarbonSimulator() {
       </label>
 
       <h3>Transport actuel</h3>
-      {Object.keys(currentTransport).map((type) => (
+      {Object.keys(transport.current).map((type) => (
         <label key={type}>
           {type}:
           <input
             type="number"
-            value={currentTransport[type as keyof Transport]}
+            value={transport.current[type as keyof Transport]}
             onChange={(e) =>
-              handleCurrentTransportChange(
+              handleTransportChange(
                 type as keyof Transport,
-                Number(e.target.value)
+                Number(e.target.value),
+                "current"
               )
             }
           />
-          km
         </label>
       ))}
 
-      <button
-        onClick={() => setCurrentCarbon(calculateCarbon(currentTransport))}
-      >
-        Valider
-      </button>
-
-      <h3>Émissions annuelles de carbone: {currentCarbon.toFixed(2)} kg CO2</h3>
-
-      <h3>Réduire mon empreinte</h3>
-      {Object.keys(newTransport).map((type) => (
-        <label key={type}>
-          {type}:
-          <input
-            type="number"
-            value={newTransport[type as keyof Transport]}
-            onChange={(e) =>
-              handleNewTransportChange(
-                type as keyof Transport,
-                Number(e.target.value)
-              )
-            }
-          />
-          km
-        </label>
-      ))}
-
-      <button onClick={() => setNewCarbon(calculateCarbon(newTransport))}>
-        Valider
-      </button>
+      <button onClick={() => handleValidate("current")}>Valider</button>
 
       <h3>
-        Émissions annuelles de carbone après réduction: {newCarbon.toFixed(2)}{" "}
+        Émissions annuelles de carbone: {carbon.current.toFixed(2)} kg CO2
+      </h3>
+
+      <h3>Réduire mon empreinte</h3>
+      {Object.keys(transport.new).map((type) => (
+        <label key={type}>
+          {type}:
+          <input
+            type="number"
+            value={transport.new[type as keyof Transport]}
+            onChange={(e) =>
+              handleTransportChange(
+                type as keyof Transport,
+                Number(e.target.value),
+                "new"
+              )
+            }
+          />
+        </label>
+      ))}
+
+      <button onClick={() => handleValidate("new")}>Valider</button>
+
+      <h3>
+        Émissions annuelles de carbone après réduction: {carbon.new.toFixed(2)}{" "}
         kg CO2
       </h3>
 
-      {newCarbon < currentCarbon && (
+      {carbon.new < carbon.current && (
         <button onClick={handleReduce}>Je choisis ceci !</button>
       )}
     </div>
