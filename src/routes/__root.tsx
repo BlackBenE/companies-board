@@ -14,7 +14,7 @@ export const Route = createRootRoute({
       </div>
       <Outlet />
       <hr />
-      <div>React, the (type) safe way ©</div>
+      <div>React, Green Travel ©</div>
     </>
   ),
 });
