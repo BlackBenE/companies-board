@@ -1,0 +1,44 @@
+.travel-carbon-simulator {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.travel-carbon-simulator h2,
+.travel-carbon-simulator h3 {
+  color: #333;
+}
+
+.travel-carbon-simulator label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.travel-carbon-simulator input[type="number"] {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.travel-carbon-simulator button {
+  background-color: #0066cc;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+}
+
+.travel-carbon-simulator button:hover {
+  background-color: #0474e3;
+}
