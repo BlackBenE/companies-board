@@ -1,9 +1,17 @@
 import "../styles/CompanyDetail.css";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, defaultSerializeError } from "@tanstack/react-router";
+import { z } from "zod";
 
 export const Route = createFileRoute("/company/$id")({
   component: CompanyDetail,
   loader: loadCompanyData,
+});
+
+const DetailCompanySchema = z.object({
+  name: z.string(),
+  description: z.string(),
+  website: z.string(),
+  domains: z.array(z.string()),
 });
 
 async function loadCompanyData(arg: { params: { id: string } }): Promise<any> {

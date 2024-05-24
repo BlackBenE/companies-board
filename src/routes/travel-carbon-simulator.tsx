@@ -114,12 +114,10 @@ function TravelCarbonSimulator() {
   return (
     <div className="travel-carbon-simulator">
       <h2>Simulateur de carbone de voyage</h2>
-
       <label>
         Nombre de voyages par an:
         <input type="number" value={trips} onChange={handleTripsChange} />
       </label>
-
       <h3>Transport actuel</h3>
       {Object.keys(transport.current).map((type) => (
         <label key={type}>
@@ -137,40 +135,40 @@ function TravelCarbonSimulator() {
           />
         </label>
       ))}
-
       <button onClick={() => handleValidate("current")}>Valider</button>
 
-      <h3>
-        Émissions annuelles de carbone: {carbon.current.toFixed(2)} kg CO2
-      </h3>
+      {carbon.current > 0 && (
+        <>
+          <h3>
+            Émissions annuelles de carbone: {carbon.current.toFixed(2)} kg CO2
+          </h3>
 
-      <h3>Réduire mon empreinte</h3>
-      {Object.keys(transport.new).map((type) => (
-        <label key={type}>
-          {type}:
-          <input
-            type="number"
-            value={transport.new[type as keyof Transport]}
-            onChange={(e) =>
-              handleTransportChange(
-                type as keyof Transport,
-                Number(e.target.value),
-                "new"
-              )
-            }
-          />
-        </label>
-      ))}
-
-      <button onClick={() => handleValidate("new")}>Valider</button>
-
-      <h3>
-        Émissions annuelles de carbone après réduction: {carbon.new.toFixed(2)}{" "}
-        kg CO2
-      </h3>
-
-      {carbon.new < carbon.current && (
-        <button onClick={handleReduce}>Je choisis ceci !</button>
+          <h3>Réduire mon empreinte</h3>
+          {Object.keys(transport.new).map((type) => (
+            <label key={type}>
+              {type}:
+              <input
+                type="number"
+                value={transport.new[type as keyof Transport]}
+                onChange={(e) =>
+                  handleTransportChange(
+                    type as keyof Transport,
+                    Number(e.target.value),
+                    "new"
+                  )
+                }
+              />
+            </label>
+          ))}
+          <button onClick={() => handleValidate("new")}>Valider</button>
+          <h3>
+            Émissions annuelles de carbone après réduction:{" "}
+            {carbon.new.toFixed(2)} kg CO2
+          </h3>
+          {carbon.new < carbon.current && (
+            <button onClick={handleReduce}>Je choisis ceci !</button>
+          )}
+        </>
       )}
     </div>
   );
