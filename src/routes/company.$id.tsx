@@ -1,5 +1,5 @@
 import "../styles/CompanyDetail.css";
-import { createFileRoute, defaultSerializeError } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
 export const Route = createFileRoute("/company/$id")({
@@ -22,7 +22,12 @@ async function loadCompanyData(arg: { params: { id: string } }): Promise<any> {
   if (!response.ok) {
     throw new Error("Failed to fetch company data");
   }
-  return await response.json();
+
+  const data = await response.json();
+
+  const validatedData = DetailCompanySchema.parse(data);
+
+  return validatedData;
 }
 
 function CompanyDetail() {
